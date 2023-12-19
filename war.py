@@ -74,7 +74,7 @@ class Play:
         player_card = self.card_game.player.place_card()
         program_card = self.card_game.program.place_card()
 
-        print(f'Player places {player_card}, Program places {program_card}')
+        print(f"Player places {player_card}, Program places {program_card}")
 
         winner = CardGame.compare_cards(player_card, program_card)
 
