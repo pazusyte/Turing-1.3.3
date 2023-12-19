@@ -1,7 +1,7 @@
 # Turing-1.3.3
 
 Have a list with a deck of 52 cards:
-  Rank (high→low):	A K Q J 10 9 8 7 6 5 4 3 2
+  Rank (high→low):	Ace King Queen Jack 10 9 8 7 6 5 4 3 2
   Symbols: hearts, spades, diamonds, clubs
 
 Randomize and divide the list into two hands, one for the program, one for the player.
