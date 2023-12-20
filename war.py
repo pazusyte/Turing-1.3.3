@@ -77,16 +77,14 @@ class GameProcess:
         print("War!\n")
 
         while True:
-            if GameProcess.check_cards_for_war(self) == "War":
+            if self.check_cards_for_war() == "War":
                 face_down_player_card = self.player.place_card()
                 face_down_program_card = self.program.place_card()
 
                 face_up_player_card = self.player.place_card()
                 face_up_program_card = self.program.place_card()
 
-                self.compare_cards(face_up_player_card, face_up_program_card)
-
-                war_winner = GameProcess.add_cards_to_hands()
+                war_winner = self.compare_war_cards(face_up_player_card, face_up_program_card)
 
                 if war_winner == "Player":
                     self.player.add_cards([face_down_player_card, face_down_program_card])
@@ -102,6 +100,18 @@ class GameProcess:
             return "Player"
         else:
             return "War"
+
+    def compare_war_cards(self, player_card, program_card):
+        ranks_order = ranks[::-1]
+
+        if ranks_order.index(player_card.rank) > ranks_order.index(program_card.rank):
+            self.player.add_cards([player_card, program_card])
+            return "Player"
+        elif ranks_order.index(player_card.rank) < ranks_order.index(program_card.rank):
+            self.program.add_cards([player_card, program_card])
+            return "Program"
+        else:
+            return None
 
 def main():
     game = GameProcess()
