@@ -87,9 +87,15 @@ class GameProcess:
                 war_winner = self.compare_war_cards(face_up_player_card, face_up_program_card)
 
                 if war_winner == "Player":
+                    print(f"Player wins {face_down_player_card}, {face_down_program_card}")
                     self.player.add_cards([face_down_player_card, face_down_program_card])
+                    break
                 elif war_winner == "Program":
+                    print(f"Program wins {face_down_player_card}, {face_down_program_card}")
                     self.program.add_cards([face_down_player_card, face_down_program_card])
+                    break
+                else:
+                    continue
             else:
                 break
 
@@ -111,7 +117,7 @@ class GameProcess:
             self.program.add_cards([player_card, program_card])
             return "Program"
         else:
-            return None
+            return "War"
 
 def main():
     game = GameProcess()
