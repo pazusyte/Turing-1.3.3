@@ -3,23 +3,6 @@ import random
 ranks = ["Ace", "King", "Queen", "Jack", "10", "9", "8", "7", "6", "5", "4", "3", "2"]
 symbols = ["hearts", "spades", "diamonds", "clubs"]
 
-
-def main():
-    game = CardGame()
-    play = Play(game)
-
-    player_hand = game.player.hand = game.deck.deal(26)
-    program_hand = game.program.hand = game.deck.deal(26)
-
-    while player_hand and program_hand:
-        play.play_round()
-
-    if not player_hand:
-        print("Player ran out of cards. Program wins!")
-    else:
-        print("Program ran out of cards. Player wins!")
-
-
 class Card:
     def __init__(self, rank, symbol):
         self.rank = rank
@@ -27,7 +10,6 @@ class Card:
 
     def __str__(self):
         return f"{self.rank} of {self.symbol}"
-
 
 class Deck:
     def __init__(self):
@@ -39,7 +21,6 @@ class Deck:
         self.cards = self.cards[num_cards:]
         return dealt_cards
 
-
 class Player:
     def __init__(self, name):
         self.name = name
@@ -48,72 +29,94 @@ class Player:
     def place_card(self):
         return self.hand.pop(0)
 
+    def add_cards(self, cards):
+        self.hand.extend(cards)
 
-class CardGame:
+
+class GameProcess:
     def __init__(self):
-        self.deck = Deck() 
+        self.deck = Deck()
         self.player = Player("Player")
         self.program = Player("Program")
-
-    def display_winner(self, winner):
-        print(
-            f"{winner} wins!\nPlayer cards: {len(self.player.hand)}, Program cards: {len(self.program.hand)}\n"
-        )
-
-    @staticmethod
-    def compare_cards(player_card, program_card):
-        ranks_order = ranks[::-1]
-
-        if ranks_order.index(player_card.rank) > ranks_order.index(program_card.rank):
-            return "Player"
-        elif ranks_order.index(player_card.rank) < ranks_order.index(program_card.rank):
-            return "Program"
-        else:
-            return "War"
-
-    @staticmethod
-    def check_cards_for_war(player_card_hand, program_card_hand):
-        if len(player_card_hand) < 2:
-            return "Program"
-        elif len(program_card_hand) < 2:
-            return "Player"
-        else:
-            return "War"
-
-
-class Play:
-    def __init__(self, card_game):
-        self.card_game = card_game
 
     def play_round(self):
         input("Press Enter to place a card\n")
 
-        player_card = self.card_game.player.place_card()
-        program_card = self.card_game.program.place_card()
+        player_placed_card = self.player.place_card()
+        program_placed_card = self.program.place_card()
 
-        print(f"Player places {player_card}, Program places {program_card}")
+        print(f"Player places {player_placed_card}, Program places {program_placed_card}")
 
-        winner = CardGame.compare_cards(player_card, program_card)
+        self.compare_cards(player_placed_card, program_placed_card)
 
-        if winner == "War":
-            resolve_war()
-            # to check if player and program have enough cards to play for the war.
+        return self.player.hand, self.program.hand
+
+    def compare_cards(self, player_card, program_card):
+        ranks_order = ranks[::-1]
+
+        if ranks_order.index(player_card.rank) > ranks_order.index(program_card.rank):
+            self.add_cards_to_hands("Player", player_card, program_card)
+        elif ranks_order.index(player_card.rank) < ranks_order.index(program_card.rank):
+            self.add_cards_to_hands("Program", player_card, program_card)
         else:
-            self.card_game.display_winner(winner)
+            self.resolve_war()
 
-    def resolve_war(self, player_card_hand, program_card_hand):
+    def add_cards_to_hands(self, winner, player_card, program_card):
+        if winner == "Player":
+            self.player.add_cards([player_card, program_card])
+        elif winner == "Program":
+            self.program.add_cards([player_card, program_card])
+
+        self.display_winner(winner)
+        return winner
+
+    def display_winner(self, winner):
+        print(f"{winner} wins!\nPlayer cards: {len(self.player.hand)}, Program cards: {len(self.program.hand)}\n")
+
+    def resolve_war(self):
         print("War!\n")
 
-        if CardGame.check_cards_for_war() == "war":
-            face_down_player_card = self.card_game.player.place_card()
-            face_down_program_card = self.card_game.program.place_card()
-            face_up_player_card = self.card_game.player.place_card()
-            face_up_program_card = self.card_game.program.place_card()
+        while True:
+            if GameProcess.check_cards_for_war(self) == "War":
+                face_down_player_card = self.player.place_card()
+                face_down_program_card = self.program.place_card()
 
-            
+                face_up_player_card = self.player.place_card()
+                face_up_program_card = self.program.place_card()
+
+                self.compare_cards(face_up_player_card, face_up_program_card)
+
+                war_winner = GameProcess.add_cards_to_hands()
+
+                if war_winner == "Player":
+                    self.player.add_cards([face_down_player_card, face_down_program_card])
+                elif war_winner == "Program":
+                    self.program.add_cards([face_down_player_card, face_down_program_card])
+            else:
+                break
+
+    def check_cards_for_war(self):
+        if len(self.player.hand) < 2:
+            return "Program"
+        elif len(self.program.hand) < 2:
+            return "Player"
         else:
-            pass
+            return "War"
 
+def main():
+    game = GameProcess()
+
+    player_hand = game.player.hand = game.deck.deal(26)
+    program_hand = game.program.hand = game.deck.deal(26)
+
+    while player_hand and program_hand:
+        player_hand, program_hand = game.play_round()
+
+    if not player_hand:
+        print("Player ran out of cards. Program wins!")
+    else:
+        print("Program ran out of cards. Player wins!")
 
 if __name__ == "__main__":
     main()
+
