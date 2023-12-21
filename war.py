@@ -66,12 +66,15 @@ def resolve_war(player, program, ranks_order, player_card, program_card):
 
         war_winner = compare_cards(face_up_player_card, face_up_program_card, ranks_order)
 
-        if war_winner is not None:
+        if war_winner != "War":
             player.add_cards(cards_to_add_to_hand)
             display_winner(war_winner, player, program)
-
-        if war_winner != "War":
+            print(f"Length of player.hand after resolving war: {len(player.hand)}")
+            print(f"Length of program.hand after resolving war: {len(program.hand)}")
             break
+
+        else:
+            continue
 
 def main():
     deck = Deck()
